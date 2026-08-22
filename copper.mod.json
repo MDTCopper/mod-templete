@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "meta": {
+    "id": "example:examplemod",
+    "name": "Example Mod",
+    "author": "Example",
+    "version": "1.0.0",
+    "main": "example.examplemod.ExampleMod",
+    "mixins": {
+      "mindustry": "mixins/mindustry.json"
+    }
+  }
+}

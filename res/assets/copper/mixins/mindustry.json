@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "config": {
+    "required": true,
+    "minVersion": "0.8",
+    "package": "copper.patchnh.patch.impl",
+    "mixins": {
+      "*": [
+        "MyPatch"
+      ]
+    }
+  }
+}
