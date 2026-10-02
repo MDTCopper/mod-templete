@@ -39,3 +39,5 @@ bin/
 ### Copper Loader ###
 .mindustry/
 .mixin.out/
+loader.jar
+game.jar

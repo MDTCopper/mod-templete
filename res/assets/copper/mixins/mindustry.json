@@ -3,7 +3,7 @@
   "config": {
     "required": true,
     "minVersion": "0.8",
-    "package": "copper.patchnh.patch.impl",
+    "package": "example.examplemod.patch.impl",
     "mixins": {
       "*": [
         "MyPatch"

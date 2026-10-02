@@ -23,8 +23,10 @@ ext {
     // replace <copperVersion> to the value of copperVersion variable above
     mixinVersion = '0.1.3'
     gameVersion = 'v159.7'
+}
 
-    modId = 'example:examplemod'
+configurations {
+    loaderDesktop { transitive = false }
 }
 
 dependencies {
@@ -35,6 +37,9 @@ dependencies {
     compileOnly "com.github.MDTCopper.loader:mod:$copperVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$gameVersion"
     annotationProcessor "com.github.MDTCopper:Mixin:$mixinVersion:processor"
+
+    // for mod debugging
+    loaderDesktop "com.github.MDTCopper.loader:desktop:$copperVersion"
 }
 
 jar {
@@ -53,15 +58,62 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.WARN
 }
 
-tasks.register('prepareDebugJar', Copy) {
-    group = 'build'
-    dependsOn jar
+tasks.register('downloadLoader') {
+    def targetFile = layout.projectDirectory.file('loader.jar')
+    outputs.file(targetFile)
 
-    from jar
+    onlyIf { !targetFile.asFile.exists() }
 
-    into layout.projectDirectory.dir('.mindustry/copper/mods')
+    doLast {
+        def target = targetFile.asFile
+        if (target.exists())
+            return
 
-    rename { String fileName ->
-        modId.replace(':', '-') + '.jar'
+        def desktopJar = configurations.loaderDesktop.resolve().find {
+            it.name.endsWith('.jar') && it.name.contains('desktop')
+        }
+        if (desktopJar == null) {
+            throw new GradleException(
+                    "failed to parse loader: $copperVersion"
+            )
+        }
+
+        target.parentFile?.mkdirs()
+        target.bytes = desktopJar.bytes
+        logger.lifecycle("downloaded loader: $copperVersion")
     }
+}
+
+tasks.register('downloadMindustry') {
+    def targetFile = layout.projectDirectory.file('game.jar')
+    def downloadUrl = "https://github.com/Anuken/Mindustry/releases/download/${gameVersion}/Mindustry.jar"
+    outputs.file(targetFile)
+
+    onlyIf { !targetFile.asFile.exists() }
+
+    doLast {
+        def target = targetFile.asFile
+        target.parentFile?.mkdirs()
+        logger.lifecycle("downloading Mindustry from ${downloadUrl} ...")
+        new URL(downloadUrl).withInputStream { input ->
+            target.withOutputStream { output ->
+                output << input
+            }
+        }
+        logger.lifecycle("downloaded Mindustry: $gameVersion")
+    }
+}
+
+tasks.register('prepareDebugJar', Copy) {
+    dependsOn jar
+    from jar
+    into layout.projectDirectory.dir('.mindustry/copper/mods')
+    rename { 'mod-to-debug.jar' }
+}
+
+tasks.register('prepareDebug') {
+    group = 'build'
+    dependsOn 'downloadLoader'
+    dependsOn 'downloadMindustry'
+    dependsOn 'prepareDebugJar'
 }
