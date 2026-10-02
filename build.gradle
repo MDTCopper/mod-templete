@@ -18,7 +18,7 @@ ext {
     // use a release tag or a commit hash
     // do not use `snapshot`. it's for github release
     // do not use `-SNAPSHOT`. it'll stuck for a long time because jitpack rebuild it everytime you fetch
-    copperVersion = '71ac7d5899'
+    copperVersion = 'cbe91ff356'
     // fetch this field from https://github.com/MDTCopper/loader/blob/<copperVersion>/gradle.properties
     // replace <copperVersion> to the value of copperVersion variable above
     mixinVersion = '0.1.3'
